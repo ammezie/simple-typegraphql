@@ -4,25 +4,25 @@ import {
   Mutation,
   Query,
   Resolver,
-  Root,
+  Root
 } from "type-graphql";
-import { projects, tasks } from "../data";
+import { projects, tasks, TaskData } from "../data";
 import Task from "../schemas/Task";
 
 @Resolver(of => Task)
 export default class {
   @Query(returns => [Task])
-  fetchTasks() {
+  fetchTasks(): TaskData[] {
     return tasks;
   }
 
   @Query(returns => Task, { nullable: true })
-  getTask(@Arg("id") id: number) {
+  getTask(@Arg("id") id: number): TaskData | undefined {
     return tasks.find(task => task.id === id);
   }
 
   @Mutation(returns => Task)
-  markAsCompleted(@Arg("taskID") taskID: number) {
+  markAsCompleted(@Arg("taskID") taskID: number): TaskData {
     const task = tasks.find(task => {
       return task.id === taskID;
     });
@@ -41,10 +41,9 @@ export default class {
   }
 
   @FieldResolver()
-  project(@Root() task: Task) {
+  project(@Root() taskData: TaskData) {
     return projects.find(project => {
-      // task.project is undefined
-      return project.id === task.project.id;
+      return project.id === taskData.project_id;
     });
   }
 }
